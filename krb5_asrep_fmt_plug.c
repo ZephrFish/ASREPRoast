@@ -16,14 +16,15 @@
  */
 
 #if FMT_EXTERNS_H
-extern struct fmt_main fmt_krb5asrep;
+extern struct fmt_main fmt_krb5tgs;
 #elif FMT_REGISTERS_H
-john_register_one(&fmt_krb5asrep);
+john_register_one(&fmt_krb5tgs);
 #else
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -32,31 +33,29 @@ john_register_one(&fmt_krb5asrep);
 #include "formats.h"
 #include "common.h"
 #include "dyna_salt.h"
-#include "rc4.h"
 #include "md4.h"
 #include "hmacmd5.h"
+#include "rc4.h"
 #include "unicode.h"
-#include "memdbg.h"
+
+#define FORMAT_LABEL         "krb5tgs"
+#define FORMAT_NAME          "Kerberos 5 TGS etype 23"
+#define FORMAT_TAG           "$krb5tgs$23$"
+#define FORMAT_TAG_LEN       (sizeof(FORMAT_TAG)-1)
+#define ALGORITHM_NAME       "MD4 HMAC-MD5 RC4"
+#define BENCHMARK_COMMENT    ""
+#define BENCHMARK_LENGTH     0
+#define PLAINTEXT_LENGTH     125
+#define BINARY_SIZE          0
+#define BINARY_ALIGN         MEM_ALIGN_NONE
+#define SALT_SIZE            sizeof(struct custom_salt *)
+#define SALT_ALIGN           sizeof(struct custom_salt *)
+#define MIN_KEYS_PER_CRYPT   1
+#define MAX_KEYS_PER_CRYPT   64
 
 #ifndef OMP_SCALE
-#define OMP_SCALE		256
+#define OMP_SCALE            4 // Tuned w/ MKPC for core i7
 #endif
-
-#define FORMAT_LABEL		"krb5asrep"
-#define FORMAT_NAME		"Kerberos 5 AS-REP etype 23"
-#define FORMAT_TAG           "$krb5asrep$23$"
-#define FORMAT_TAG_LEN       (sizeof(FORMAT_TAG)-1)
-#define ALGORITHM_NAME		"MD4 HMAC-MD5 RC4"
-#define BENCHMARK_COMMENT	""
-#define BENCHMARK_LENGTH	-1000
-#define MIN_PLAINTEXT_LENGTH	0
-#define PLAINTEXT_LENGTH	125
-#define BINARY_SIZE		0
-#define BINARY_ALIGN		MEM_ALIGN_NONE
-#define SALT_SIZE		sizeof(struct custom_salt *)
-#define SALT_ALIGN		sizeof(struct custom_salt *)
-#define MIN_KEYS_PER_CRYPT	1
-#define MAX_KEYS_PER_CRYPT	1
 
 /*
   assuming checksum == edata1
@@ -349,7 +348,7 @@ struct fmt_main fmt_krb5asrep = {
 		ALGORITHM_NAME,
 		BENCHMARK_COMMENT,
 		BENCHMARK_LENGTH,
-		MIN_PLAINTEXT_LENGTH,
+		/* MIN_PLAINTEXT_LENGTH, */
 		PLAINTEXT_LENGTH,
 		BINARY_SIZE,
 		BINARY_ALIGN,
